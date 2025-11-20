@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface MusicRepository {
     suspend fun getSongs(): List<Song>
     fun getSongById(id: String): Song?
+    fun observeLibraryChanges(onChange: () -> Unit)
+    fun removeLibraryObserver()
 }

@@ -22,7 +22,8 @@ class MusicPlayerViewModel @Inject constructor(
     private val getSongsUseCase: GetSongsUseCase,
     private val playSongUseCase: PlaySongUseCase,
     private val controlPlaybackUseCase: ControlPlaybackUseCase,
-    getPlayerStateUseCase: GetPlayerStateUseCase
+    getPlayerStateUseCase: GetPlayerStateUseCase,
+    private val musicRepository: com.example.mediasessionplayer.domain.repository.MusicRepository
 ) : ViewModel() {
 
     private val _songs = MutableStateFlow<List<Song>>(emptyList())
@@ -36,7 +37,10 @@ class MusicPlayerViewModel @Inject constructor(
         )
 
     init {
-        // loadSongs() // Commented out to prevent automatic loading of songs
+        musicRepository.observeLibraryChanges {
+            loadSongs()
+        }
+        loadSongs()
     }
 
     fun loadSongs() {
@@ -75,5 +79,10 @@ class MusicPlayerViewModel @Inject constructor(
 
     fun skipToPrevious() {
         controlPlaybackUseCase.skipToPrevious()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        musicRepository.removeLibraryObserver()
     }
 }

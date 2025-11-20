@@ -45,4 +45,11 @@ class MusicService : MediaSessionService() {
         }
         super.onDestroy()
     }
+
+    override fun onTaskRemoved(rootIntent: android.content.Intent?) {
+        super.onTaskRemoved(rootIntent)
+        // Parar playback y cerrar el servicio permanentemente cuando la app se quita del overview
+        player.stop()
+        stopSelf()
+    }
 }

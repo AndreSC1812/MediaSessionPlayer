@@ -2,8 +2,11 @@ package com.example.mediasessionplayer.data.source
 
 import android.content.ContentUris
 import android.content.Context
+import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import androidx.core.net.toUri
 import com.example.mediasessionplayer.domain.model.Song
@@ -15,6 +18,9 @@ import javax.inject.Singleton
 class LocalMusicDataSource @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+
+    private var observer: ContentObserver? = null
+    private var onMediaStoreChanged: (() -> Unit)? = null
 
     fun getLocalSongs(): List<Song> {
         val songs = mutableListOf<Song>()
@@ -80,5 +86,29 @@ class LocalMusicDataSource @Inject constructor(
         }
 
         return songs
+    }
+
+    fun observeMediaStoreChanges(onChange: () -> Unit) {
+        onMediaStoreChanged = onChange
+        if (observer == null) {
+            observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
+                override fun onChange(selfChange: Boolean) {
+                    onMediaStoreChanged?.invoke()
+                }
+            }
+            context.contentResolver.registerContentObserver(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                true,
+                observer!!
+            )
+        }
+    }
+
+    fun removeMediaStoreObserver() {
+        observer?.let {
+            context.contentResolver.unregisterContentObserver(it)
+            observer = null
+        }
+        onMediaStoreChanged = null
     }
 }

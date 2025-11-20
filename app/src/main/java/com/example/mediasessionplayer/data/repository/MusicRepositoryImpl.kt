@@ -12,6 +12,7 @@ class MusicRepositoryImpl @Inject constructor(
 ) : MusicRepository {
 
     private var cachedSongs: List<Song>? = null
+    private var onLibraryChanged: (() -> Unit)? = null
 
     override suspend fun getSongs(): List<Song> {
         if (cachedSongs == null) {
@@ -23,5 +24,18 @@ class MusicRepositoryImpl @Inject constructor(
 
     override fun getSongById(id: String): Song? {
         return cachedSongs?.find { it.id == id }
+    }
+
+    override fun observeLibraryChanges(onChange: () -> Unit) {
+        onLibraryChanged = onChange
+        localMusicDataSource.observeMediaStoreChanges {
+            cachedSongs = null // Clear cache to force reload
+            onLibraryChanged?.invoke()
+        }
+    }
+
+    override fun removeLibraryObserver() {
+        localMusicDataSource.removeMediaStoreObserver()
+        onLibraryChanged = null
     }
 }
