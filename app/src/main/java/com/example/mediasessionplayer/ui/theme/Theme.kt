@@ -1,66 +1,71 @@
 package com.example.mediasessionplayer.ui.theme
 
-import android.app.Activity
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
+import com.example.mediasessionplayer.ui.theme.SpotifyGreen
+import com.example.mediasessionplayer.ui.theme.SpotifyBlack
+import com.example.mediasessionplayer.ui.theme.SpotifyGreenDark
+import com.example.mediasessionplayer.ui.theme.SpotifyWhite
+import com.example.mediasessionplayer.ui.theme.SpotifyGreenLight
+import com.example.mediasessionplayer.ui.theme.SpotifyMediumGray
+import com.example.mediasessionplayer.ui.theme.SpotifyLightText
+import com.example.mediasessionplayer.ui.theme.SpotifyPurple
+import com.example.mediasessionplayer.ui.theme.SpotifyBlue
+import com.example.mediasessionplayer.ui.theme.SpotifyDarkGray
+import com.example.mediasessionplayer.ui.theme.SpotifyLightGray
+import com.example.mediasessionplayer.ui.theme.SpotifyRed
 
 // Spotify-inspired Dark Color Scheme
 private val SpotifyDarkColorScheme = darkColorScheme(
     // Primary colors - Spotify Green
-    primary = Color(0xFF1DB954),
-    onPrimary = Color(0xFF000000),
-    primaryContainer = Color(0xFF38893E),
-    onPrimaryContainer = Color(0xFFFFFFFF),
+    primary = SpotifyGreen,
+    onPrimary = SpotifyBlack,
+    primaryContainer = SpotifyGreenDark,
+    onPrimaryContainer = SpotifyWhite,
 
     // Secondary colors
-    secondary = Color(0xFF66CC00),
-    onSecondary = Color(0xFF000000),
-    secondaryContainer = Color(0xFF455A64),
-    onSecondaryContainer = Color(0xFFC9E4CA),
+    secondary = SpotifyGreenLight,
+    onSecondary = SpotifyBlack,
+    secondaryContainer = SpotifyMediumGray,
+    onSecondaryContainer = SpotifyLightText,
 
     // Tertiary colors
-    tertiary = Color(0xFF7C4DFF),
-    onTertiary = Color(0xFFFFFFFF),
-    tertiaryContainer = Color(0xFF560BAD),
-    onTertiaryContainer = Color(0xFFFFFFFF),
+    tertiary = SpotifyPurple,
+    onTertiary = SpotifyWhite,
+    tertiaryContainer = SpotifyBlue,
+    onTertiaryContainer = SpotifyWhite,
 
     // Background
-    background = Color(0xFF121212),
-    onBackground = Color(0xFFFFFFFF),
+    background = SpotifyBlack,
+    onBackground = SpotifyWhite,
 
     // Surface
-    surface = Color(0xFF181818),
-    onSurface = Color(0xFFFFFFFF),
-    surfaceVariant = Color(0xFF333333),
-    onSurfaceVariant = Color(0xFFC9E4CA),
+    surface = SpotifyDarkGray,
+    onSurface = SpotifyWhite,
+    surfaceVariant = SpotifyMediumGray,
+    onSurfaceVariant = SpotifyLightText,
 
     // Surface container
-    surfaceContainer = Color(0xFF333333),
-    surfaceContainerHigh = Color(0xFF4F4F4F),
-    surfaceContainerHighest = Color(0xFF4F4F4F),
+    surfaceContainer = SpotifyMediumGray,
+    surfaceContainerHigh = SpotifyLightGray,
+    surfaceContainerHighest = SpotifyLightGray,
 
     // Outline
-    outline = Color(0xFF808080),
-    outlineVariant = Color(0xFF333333),
+    outline = SpotifyLightGray,
+    outlineVariant = SpotifyMediumGray,
 
     // Error
-    error = Color(0xFFBA1A1A),
-    onError = Color(0xFFFFFFFF),
+    error = SpotifyRed,
+    onError = SpotifyWhite,
     errorContainer = Color(0xFF93000A),
     onErrorContainer = Color(0xFFFFDAD6),
 
     // Inverse
-    inverseSurface = Color(0xFFFFFFFF),
-    inverseOnSurface = Color(0xFF000000),
-    inversePrimary = Color(0xFF38893E),
+    inverseSurface = SpotifyWhite,
+    inverseOnSurface = SpotifyBlack,
+    inversePrimary = SpotifyGreenDark,
 )
 
 @Composable
@@ -69,17 +74,6 @@ fun MediaSessionPlayerTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = SpotifyDarkColorScheme
-
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.background.toArgb()
-            window.navigationBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = false
-        }
-    }
 
     MaterialTheme(
         colorScheme = colorScheme,

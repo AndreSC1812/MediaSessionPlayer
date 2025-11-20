@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -18,12 +19,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import com.example.mediasessionplayer.presentation.ui.MusicPlayerScreen
 import com.example.mediasessionplayer.presentation.ui.NowPlayingScreen
 import com.example.mediasessionplayer.presentation.viewmodel.MusicPlayerViewModel
 import com.example.mediasessionplayer.ui.theme.MediaSessionPlayerTheme
+import com.example.mediasessionplayer.ui.theme.SpotifyBlack
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -52,6 +58,17 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MediaSessionPlayerTheme {
+                // Force system bars colors to stay consistent
+                SideEffect {
+                    window.statusBarColor = android.graphics.Color.TRANSPARENT
+                    window.navigationBarColor = SpotifyBlack.value.toLong().toInt()
+
+                    WindowCompat.getInsetsController(window, window.decorView).apply {
+                        isAppearanceLightStatusBars = false
+                        isAppearanceLightNavigationBars = false
+                    }
+                }
+
                 val songs by viewModel.songs.collectAsState()
                 val playerState by viewModel.playerState.collectAsState()
                 val sheetState = rememberModalBottomSheetState(
@@ -88,8 +105,24 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         dragHandle = null, // handle not visible
                         containerColor = androidx.compose.ui.graphics.Color.Transparent,
-                        scrimColor = androidx.compose.ui.graphics.Color.Transparent
+                        contentWindowInsets = { WindowInsets(0) },
+                        scrimColor = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.0f)
                     ) {
+                        // Get the ModalBottomSheet's window to set system bars colors
+                        val view = LocalView.current
+                        (view.parent as? DialogWindowProvider)?.window?.let { dialogWindow ->
+                            SideEffect {
+                                dialogWindow.statusBarColor = android.graphics.Color.TRANSPARENT
+                                dialogWindow.navigationBarColor =
+                                    SpotifyBlack.value.toLong().toInt()
+
+                                WindowCompat.getInsetsController(dialogWindow, view).apply {
+                                    isAppearanceLightStatusBars = false
+                                    isAppearanceLightNavigationBars = false
+                                }
+                            }
+                        }
+
                         NowPlayingScreen(
                             playerState = playerState,
                             onDismiss = {
