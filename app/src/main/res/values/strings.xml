@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">MediaSessionPlayer</string>
+
+    <string name="library_title">Your Library</string>
+    <string name="library_empty_title">No music found</string>
+    <string name="library_empty_message">Add music files to your device to start listening</string>
+
+    <string name="permission_title">Access to your music</string>
+    <string name="permission_message">MediaSessionPlayer needs permission to read the audio files on your device to build your library.</string>
+    <string name="permission_grant">Grant permission</string>
+    <string name="permission_open_settings">Open settings</string>
+
+    <string name="cd_album_art">Album art</string>
+    <string name="cd_album_art_for">Album art for %1$s</string>
+    <string name="cd_close_player">Close player</string>
+    <string name="cd_play">Play</string>
+    <string name="cd_pause">Pause</string>
+    <string name="cd_previous">Previous</string>
+    <string name="cd_next">Next</string>
+    <string name="cd_now_playing">Now playing</string>
 </resources>
