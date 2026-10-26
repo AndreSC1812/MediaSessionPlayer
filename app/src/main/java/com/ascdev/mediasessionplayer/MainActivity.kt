@@ -80,7 +80,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MediaSessionPlayerTheme {
-                val songs by viewModel.songs.collectAsStateWithLifecycle()
+                val libraryState by viewModel.libraryState.collectAsStateWithLifecycle()
                 val playerState by viewModel.playerState.collectAsStateWithLifecycle()
                 val sheetState = rememberModalBottomSheetState(
                     skipPartiallyExpanded = true
@@ -93,7 +93,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 MusicPlayerScreen(
-                    songs = songs,
+                    libraryState = libraryState,
                     playerState = playerState,
                     hasPermission = hasPermission,
                     isPermissionPermanentlyDenied = isPermissionPermanentlyDenied,

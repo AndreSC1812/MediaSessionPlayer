@@ -16,10 +16,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformLatest
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,17 +34,26 @@ class MusicPlayerViewModel @Inject constructor(
 
     private val reloadRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    // Reloads on demand (e.g. after the permission is granted) and whenever MediaStore changes.
-    // MediaStore fires several change events per file, so they are debounced into a single query.
+    // Loads the library right away, reloads on demand (e.g. after the permission is granted)
+    // and whenever MediaStore changes. Only explicit reloads go back to Loading, so background
+    // library updates replace the list without flashing an empty state.
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val songs: StateFlow<List<Song>> = merge(reloadRequests, observeLibraryChangesUseCase())
-        .onStart { emit(Unit) }
-        .debounce(LIBRARY_RELOAD_DEBOUNCE_MS)
-        .mapLatest { getSongsUseCase() }
+    val libraryState: StateFlow<LibraryState> = merge(
+        reloadRequests.map { LoadReason.RELOAD_REQUESTED },
+        observeLibraryChangesUseCase()
+            // MediaStore fires several change events per file, so they become a single query
+            .debounce(LIBRARY_CHANGES_DEBOUNCE_MS)
+            .map { LoadReason.LIBRARY_CHANGED }
+    )
+        .onStart { emit(LoadReason.INITIAL) }
+        .transformLatest { reason ->
+            if (reason == LoadReason.RELOAD_REQUESTED) emit(LibraryState.Loading)
+            emit(LibraryState.Loaded(getSongsUseCase()))
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
+            initialValue = LibraryState.Loading
         )
 
     val playerState: StateFlow<PlayerState> = getPlayerStateUseCase()
@@ -58,7 +68,7 @@ class MusicPlayerViewModel @Inject constructor(
     }
 
     fun playSong(song: Song) {
-        val currentSongs = songs.value
+        val currentSongs = (libraryState.value as? LibraryState.Loaded)?.songs.orEmpty()
         val index = currentSongs.indexOf(song)
         if (index != -1) {
             // Set the entire playlist and start from the selected song
@@ -90,6 +100,8 @@ class MusicPlayerViewModel @Inject constructor(
     }
 
     private companion object {
-        const val LIBRARY_RELOAD_DEBOUNCE_MS = 300L
+        const val LIBRARY_CHANGES_DEBOUNCE_MS = 300L
     }
+
+    private enum class LoadReason { INITIAL, RELOAD_REQUESTED, LIBRARY_CHANGED }
 }

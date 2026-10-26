@@ -29,11 +29,12 @@ import com.ascdev.mediasessionplayer.domain.model.PlayerState
 import com.ascdev.mediasessionplayer.domain.model.Song
 import com.ascdev.mediasessionplayer.presentation.ui.components.AlbumArt
 import com.ascdev.mediasessionplayer.presentation.ui.components.PlaybackSlider
+import com.ascdev.mediasessionplayer.presentation.viewmodel.LibraryState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MusicPlayerScreen(
-    songs: List<Song>,
+    libraryState: LibraryState,
     playerState: PlayerState,
     hasPermission: Boolean,
     isPermissionPermanentlyDenied: Boolean,
@@ -98,6 +99,8 @@ fun MusicPlayerScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Nothing is shown while loading: the query is usually too fast for a spinner
+                val songs = (libraryState as? LibraryState.Loaded)?.songs ?: return@LazyColumn
                 if (songs.isEmpty()) {
                     item {
                         Column(
