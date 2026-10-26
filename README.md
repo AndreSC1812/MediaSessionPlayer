@@ -1,3 +1,5 @@
+![MediaSessionPlayer logo](docs/logo.png)
+
 # MediaSessionPlayer
 
 MediaSessionPlayer is a local music player for Android built with Kotlin, Jetpack Compose and Media3. It offers background playback, media notification controls and a Spotify-inspired interface to enjoy the music stored on your device.
